@@ -35,7 +35,7 @@ from meissner import __root_dir__
 
 import json
 import logging
-import os
+import os.path
 
 log = logging.getLogger(__name__)
 

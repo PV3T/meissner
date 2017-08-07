@@ -31,7 +31,8 @@
     SOFTWARE.
 """
 
-import json
+from json.decoder import JSONDecodeError
+
 import logging
 import meissner.config
 import requests
@@ -40,48 +41,52 @@ log = logging.getLogger(__name__)
 
 config_mgr = meissner.config.ConfigManager()
 
-app_id = config_mgr.get('oxford_dict_app_id')
-app_key = config_mgr.get('oxford_dict_app_key')
+client_id = config_mgr.get('naver_client_id')
+client_secret = config_mgr.get('naver_client_secret')
 
-api_url = "https://od-api.oxforddictionaries.com/api/v1/entries/en/"
+# search_api_url = "https://openapi.naver.com/v1/search/webkr.json?"
+papago_api_url = "https://openapi.naver.com/v1/papago/n2mt?"
 
-def get_word_meanings(word: str) -> list:
-    response = requests.get(api_url + word.lower(), headers={'app_id': app_id, 'app_key': app_key})
+def papago_translate(source: str, target: str, text: str) -> str:
+    """
+        Translate a text using the NAVER Papago NMT API.
+        Supported languages: ko, en, zh-CN (ko <-> en / ko <-> zh-CN)
+    """
+    req_vars = {
+        'source': source,
+        'target': target,
+        'text': text
+    }
 
-    # Check if the result is valid json
+    response = requests.post(
+        papago_api_url,
+        req_vars,
+        headers={
+            'X-Naver-Client-Id': client_id,
+            'X-Naver-Client-Secret': client_secret
+        }
+    )
+
     try:
-        log.info("Retrieving JSON model of '{0}' from {1}".format(word, api_url))
         raw_dict = response.json()
-    except json.decoder.JSONDecodeError:  # Subclass of ValueError
+    except JSONDecodeError:  # Subclass of ValueError
         log.error("Could not retrieve JSON model: Invalid JSON")
-        return []
+        return ""
 
-    if not isinstance(raw_dict, dict) or 'results' not in raw_dict:
-        return []
+    if not isinstance(raw_dict, dict) or 'message' not in raw_dict:
+        if 'errorCode' in raw_dict:
+            return raw_dict['errorCode']
 
-    results = raw_dict['results'][0]
+        return ""
 
-    if 'lexicalEntries' not in results:
-        return []
+    message = raw_dict['message']
 
-    lexi_entries = results['lexicalEntries'][0]
+    if 'result' not in message:
+        return ""
 
-    if 'entries' not in lexi_entries:
-        return []
+    result = message['result']
 
-    entries = lexi_entries['entries'][0]
+    if 'translatedText' not in result:
+        return ""
 
-    if 'senses' not in entries:
-        return []
-
-    senses = entries['senses']
-
-    result = []
-
-    for def_dict in senses:
-        if 'definitions' in def_dict:
-            result.append(def_dict['definitions'][0])
-
-    # TODO: What am I supposed to do if the def_dict['definitions'] has more than 2 elements?
-
-    return result
+    return result['translatedText']

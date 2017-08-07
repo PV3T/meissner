@@ -54,6 +54,7 @@ class MeissnerBot(discord.Client):
         self.register_command(GameCommand())
         self.register_command(HelpCommand())
         self.register_command(OxdictCommand())
+        self.register_command(PapagoCommand())
         self.register_command(PrefixCommand())
         self.register_command(PruneCommand())
         self.register_command(StatusCommand())

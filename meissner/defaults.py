@@ -33,6 +33,7 @@
 
 from meissner.command import Command
 from meissner.oxford import get_word_meanings
+from meissner.naver import papago_translate
 from meissner.utils import get_color, get_id_by_mention
 
 import discord
@@ -41,6 +42,18 @@ import meissner
 import sys
 
 log = logging.getLogger(__name__)
+
+papago_error_messages = {
+    'N2MT01': 'Invalid source parameter supplied.',
+    'N2MT02': 'Unsupported source language.',
+    'N2MT03': 'Invalid target parameter supplied.',
+    'N2MT04': 'Unsupported target language.',
+    'N2MT05': 'Source and target language are the same.',
+    'N2MT06': 'Translator not implemented yet.',
+    'N2MT07': 'Invalid text parameter supplied.',
+    'N2MT08': 'Text parameter exceeds max length.',
+    'N2MT99': 'Internal Server Error.',
+}
 
 async def result(res: str, channel: discord.abc.Messageable, res_color = get_color("msr_default")):
     try:
@@ -51,13 +64,13 @@ async def result(res: str, channel: discord.abc.Messageable, res_color = get_col
         await channel.send("```{}```".format(result))
 
 async def error(message, channel):
-    await result(message, channel, get_color("red"))
+    await result("`ERROR: {}`".format(message), channel, get_color("red"))
 
 async def usage(message, desc, channel):
     await result(desc + "\n```Usage: {}```".format(message), channel, get_color("msr_usage"))
 
 async def warning(message, channel):
-    await result(message, channel, get_color("yellow"))
+    await result("`WARNING: {}`".format(message), channel, get_color("yellow"))
 
 class AliasCommand(Command):
     def __init__(self):
@@ -170,6 +183,28 @@ class OxdictCommand(Command):
             meanings_result += "{0}. {1}\n" . format(i + 1, meanings_list[i])
 
         await result("Meanings of '{0}' on Oxford Dictionaries:\n```{1}```".format(word, meanings_result), channel)
+
+class PapagoCommand(Command):
+    def __init__(self):
+        super().__init__('papago', "Translates a text using the NAVER Papago NMT API.", ['pp'])
+
+    async def execute(self, args, client, channel, guild):
+        try:
+            source = args[0]
+            target = args[1]
+            text = args[2]
+        except IndexError:
+            await usage('papago <source> <target> <text> ', self.description, channel)
+            return
+
+        translated_text = papago_translate(source, target, text)
+
+        if translated_text in papago_error_messages:
+            await error("{0}".format(papago_error_messages[translated_text]), channel)
+            return
+
+        await result("Papago NMT | {0}-{1}\n```Translation: {2}```".format(source, target, translated_text), channel)
+
 
 class StatusCommand(Command):
     def __init__(self):
