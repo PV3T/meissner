@@ -194,7 +194,7 @@ class PapagoCommand(Command):
             target = args[1]
             text = args[2]
         except IndexError:
-            await usage('papago <source> <target> <text> ', self.description, channel)
+            await usage('papago <source> <target> <text>', self.description, channel)
             return
 
         translated_text = papago_translate(source, target, text)

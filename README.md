@@ -8,6 +8,7 @@
 - `game <game>`: Changes the game you're playing now.
 - `help`: Shows a list of available commands.
 - `oxdict <word>`: Search English words in Oxford Dictionaries.
+- `papago <source> <target> <text>`: Translates a text using the NAVER Papago NMT API.
 - `status <status>`: Changes your status.
 - `prefix`: Shows the current meissner prefix.
 - `prune <limit>`: Deletes the messages you've sent.
