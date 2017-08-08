@@ -61,7 +61,7 @@ async def result(res: str, channel: discord.abc.Messageable, res_color = get_col
         await channel.send(embed=emb)
     except discord.Forbidden:
         log.warning("Forbidden: You don't have permissions to send embed messages.")
-        await channel.send("```{}```".format(result))
+        await channel.send("```[{0}]```\n```{1}```".format(meissner.version_string, res))
 
 async def error(message, channel):
     await result("`ERROR: {}`".format(message), channel, get_color("red"))

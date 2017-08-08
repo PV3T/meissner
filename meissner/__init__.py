@@ -34,9 +34,9 @@
 import os.path
 
 __title__ = "meissner"
-__version__ = "indev"
+__version__ = "v1.1.0_alpha1"
 __author__ = "Epsimatt"
 
-__root_dir__ = os.path.abspath('..') + os.path.sep
+__root_dir__ = os.path.abspath(os.path.join(os.getcwd(), os.path.pardir))
 
 version_string = '{}-{} by {}'.format(__title__, __version__, __author__)
