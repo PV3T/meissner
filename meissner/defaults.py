@@ -31,6 +31,7 @@
     SOFTWARE.
 """
 
+from meissner import __version_string__
 from meissner.command import Command
 from meissner.oxford import get_word_meanings
 from meissner.naver import papago_translate
@@ -38,7 +39,6 @@ from meissner.utils import get_color, get_id_by_mention
 
 import discord
 import logging
-import meissner
 import sys
 
 log = logging.getLogger(__name__)
@@ -57,11 +57,11 @@ papago_error_messages = {
 
 async def result(res: str, channel: discord.abc.Messageable, res_color = get_color("msr_default")):
     try:
-        emb = discord.Embed(title=meissner.version_string, description=res, color=res_color)
+        emb = discord.Embed(title=__version_string__, description=res, color=res_color)
         await channel.send(embed=emb)
     except discord.Forbidden:
         log.warning("Forbidden: You don't have permissions to send embed messages.")
-        await channel.send("```[{0}]```\n```{1}```".format(meissner.version_string, res))
+        await channel.send("```[{0}]```\n```{1}```".format(__version_string__, res))
 
 async def error(message, channel):
     await result("`ERROR: {}`".format(message), channel, get_color("red"))
@@ -80,20 +80,34 @@ class AliasCommand(Command):
         try:
             sub = args[0]
             cmd_name = args[1]
-            ali = args[2]
         except IndexError:
-            await usage('ali <add / remove> <command> <alias>', self.description, channel)
+            await usage('ali <add / remove / list> <command> {alias}', self.description, channel)
+            return
+
+        if sub == "list":
+            await result("{}".format(client.get_command(cmd_name).aliases), channel)
             return
 
         command = client.get_command(cmd_name) # type: Command
 
-        # TODO: ...
         if sub == "add":
+            try:
+                ali = args[2]
+            except IndexError:
+                await usage('ali add <list> <command> <alias>', self.description, channel)
+                return
+
             client.set_command_aliases([ali], command)
 
             await result("Added alias '{}' to the command.".format(ali), channel)
             return
         elif sub == "remove":
+            try:
+                ali = args[2]
+            except IndexError:
+                await usage('ali remove <list> <command> <alias>', self.description, channel)
+                return
+
             client.unset_command_aliases([ali])
 
             await result("Removed alias '{}' from the command.".format(ali), channel)

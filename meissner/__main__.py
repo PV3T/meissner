@@ -31,12 +31,41 @@
     SOFTWARE.
 """
 
-from meissner.defaults import *
-
 import discord
 import logging
 import meissner.command
+import meissner.defaults
 import shlex
+
+class MeissnerFormatter(logging.Formatter):
+    @staticmethod
+    def capitalize_first_only(string: str) -> str:
+        if len(string) > 0:
+            return string[0].upper() + string[1:]
+        else:
+            return string
+
+    def format(self, record):
+        record.msg = self.capitalize_first_only(str(record.msg).strip())
+
+        return super().format(record)
+
+
+log = logging.getLogger()
+
+log.setLevel(logging.INFO)
+
+log_handler = logging.StreamHandler()
+
+# "%(asctime)s: [%(filename)s: %(levelname)s] > %(message)s (on line %(lineno)s)"
+log_handler.setFormatter(
+    MeissnerFormatter(
+        '%(asctime)s: [%(filename)s: %(levelname)s] > %(message)s',
+        '%H:%M:%S'
+    )
+)
+
+log.addHandler(log_handler)
 
 class MeissnerBot(discord.Client):
     prefix = "!~"
@@ -45,21 +74,21 @@ class MeissnerBot(discord.Client):
     command_aliases = {}
 
     def __init__(self):
-        log.info("You are currently using: " + meissner.version_string)
+        log.info("You are currently using: " + meissner.__version_string__)
 
         super().__init__()
 
-        self.register_command(AliasCommand())
-        self.register_command(EmbedCommand())
-        self.register_command(GameCommand())
-        self.register_command(HelpCommand())
-        self.register_command(OxdictCommand())
-        self.register_command(PapagoCommand())
-        self.register_command(PrefixCommand())
-        self.register_command(PruneCommand())
-        self.register_command(StatusCommand())
-        self.register_command(QuitCommand())
-        self.register_command(UserCommand())
+        self.register_command(meissner.defaults.AliasCommand())
+        self.register_command(meissner.defaults.EmbedCommand())
+        self.register_command(meissner.defaults.GameCommand())
+        self.register_command(meissner.defaults.HelpCommand())
+        self.register_command(meissner.defaults.OxdictCommand())
+        self.register_command(meissner.defaults.PapagoCommand())
+        self.register_command(meissner.defaults.PrefixCommand())
+        self.register_command(meissner.defaults.PruneCommand())
+        self.register_command(meissner.defaults.StatusCommand())
+        self.register_command(meissner.defaults.QuitCommand())
+        self.register_command(meissner.defaults.UserCommand())
 
     async def execute_command(
             self,
@@ -162,36 +191,6 @@ class MeissnerBot(discord.Client):
 
             del self.command_aliases[alias]
 
-
-class MeissnerFormatter(logging.Formatter):
-    @staticmethod
-    def capitalize_first_only(string: str) -> str:
-        if len(string) > 0:
-            return string[0].upper() + string[1:]
-        else:
-            return string
-
-    def format(self, record):
-        record.msg = self.capitalize_first_only(str(record.msg).strip())
-
-        return super().format(record)
-
-
-log = logging.getLogger()
-
-log.setLevel(logging.INFO)
-
-log_handler = logging.StreamHandler()
-
-# "%(asctime)s: [%(filename)s: %(levelname)s] > %(message)s (on line %(lineno)s)"
-log_handler.setFormatter(
-    MeissnerFormatter(
-        '%(asctime)s: [%(filename)s: %(levelname)s] > %(message)s',
-        '%H:%M:%S'
-    )
-)
-
-log.addHandler(log_handler)
 
 try:
     with open(meissner.__root_dir__ + 'discord_token.dat') as file:
