@@ -60,21 +60,13 @@ color_dict = {
     "msr_usage": 0x40C4FF
 }
 
-def get_color(string):
-    """
-        :param string:
-        :return: colour
-    """
+def get_color(string: str) -> str:
     if re.match("[a-f0-9]{6}", string):
         return hex(int(string, 16))
     else:
         return color_dict.get(string, 0)
 
-def get_id_by_mention(mention):
-    """
-        :param str mention:
-        :return: int
-    """
+def get_id_by_mention(mention: str) -> int:
     result = re.findall(r"<@!?([0-9]+)>", mention)
 
     if not result:

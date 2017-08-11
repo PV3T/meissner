@@ -67,6 +67,9 @@ def papago_translate(source: str, target: str, text: str) -> str:
         }
     )
 
+    if response.status_code != 200:
+        return 'HTTP_' + str(response.status_code)
+
     try:
         raw_dict = response.json()
     except JSONDecodeError:  # Subclass of ValueError
@@ -90,3 +93,4 @@ def papago_translate(source: str, target: str, text: str) -> str:
         return ""
 
     return result['translatedText']
+

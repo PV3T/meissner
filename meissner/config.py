@@ -59,10 +59,13 @@ class ConfigManager:
                     ensure_ascii = False
                 )
 
+                log.info("Created a new configuration file for meissner.")
+                log.info("Please set up the config.json file.")
+
         with open(self._config_path) as file:
             self._config = json.load(file)
 
-        log.info("Loaded config.json successfully: {}" . format(self._config))
+        log.debug("Loaded config.json successfully: {}" . format(self._config))
 
     def get(self, key):
         try:

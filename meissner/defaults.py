@@ -44,6 +44,7 @@ import sys
 log = logging.getLogger(__name__)
 
 papago_error_messages = {
+    'HTTP_401': 'Authorization Failed.',
     'N2MT01': 'Invalid source parameter supplied.',
     'N2MT02': 'Unsupported source language.',
     'N2MT03': 'Invalid target parameter supplied.',
@@ -76,7 +77,7 @@ class AliasCommand(Command):
     def __init__(self):
         super().__init__('ali', "Manage command aliases.", [])
 
-    async def execute(self, args, client, channel, guild):
+    async def execute(self, args, meissner_bot, channel, guild):
         try:
             sub = args[0]
             cmd_name = args[1]
@@ -85,10 +86,10 @@ class AliasCommand(Command):
             return
 
         if sub == "list":
-            await result("{}".format(client.get_command(cmd_name).aliases), channel)
+            await result("{}".format(meissner_bot.get_command(cmd_name).aliases), channel)
             return
 
-        command = client.get_command(cmd_name) # type: Command
+        command = meissner_bot.get_command(cmd_name) # type: Command
 
         if sub == "add":
             try:
@@ -97,7 +98,7 @@ class AliasCommand(Command):
                 await usage('ali add <list> <command> <alias>', self.description, channel)
                 return
 
-            client.set_command_aliases([ali], command)
+            meissner_bot.set_command_aliases([ali], command)
 
             await result("Added alias '{}' to the command.".format(ali), channel)
             return
@@ -108,7 +109,7 @@ class AliasCommand(Command):
                 await usage('ali remove <list> <command> <alias>', self.description, channel)
                 return
 
-            client.unset_command_aliases([ali])
+            meissner_bot.unset_command_aliases([ali])
 
             await result("Removed alias '{}' from the command.".format(ali), channel)
             return
@@ -120,7 +121,7 @@ class EmbedCommand(Command):
     def __init__(self):
         super().__init__('em', "Sends an embed message with options.", [])
 
-    async def execute(self, args, client, channel, guild):
+    async def execute(self, args, meissner_bot, channel, guild):
         try:
             title = args[0]
             description = args[1]
@@ -134,12 +135,12 @@ class EmbedCommand(Command):
         target_id = 0
 
         try:
-            target_id = get_id_by_mention(args[3]) # type: int
+            target_id = get_id_by_mention(args[3])
         except IndexError:
             pass
 
         if target_id != 0:
-            target = client.get_user(target_id)  # type: discord.User
+            target = meissner_bot.get_user(target_id)  # type: discord.User
 
             emb.set_author(name=target.display_name, icon_url=target.avatar_url)
         else:
@@ -152,14 +153,14 @@ class GameCommand(Command):
     def __init__(self):
         super().__init__('game', "Changes the game you're playing now.", [])
 
-    async def execute(self, args, client, channel, guild):
+    async def execute(self, args, meissner_bot, channel, guild):
         try:
             current_game = discord.Game(name = args[0])
         except IndexError:
             await usage('game <game>', self.description, channel)
             return
 
-        await client.change_presence(game = current_game)
+        await meissner_bot.change_presence(game = current_game)
 
         await result("Your custom game has been changed to '{}'" . format(args[0]), channel)
 
@@ -168,8 +169,8 @@ class HelpCommand(Command):
     def __init__(self):
         super().__init__('help', "Shows a list of available commands.", [])
 
-    async def execute(self, args, client, channel, guild):
-        command_list = client.get_commands()
+    async def execute(self, args, meissner_bot, channel, guild):
+        command_list = meissner_bot.get_commands()
 
         await result('Commands: ' + ', '.join(command_list), channel)
 
@@ -178,7 +179,7 @@ class OxdictCommand(Command):
     def __init__(self):
         super().__init__('oxdict', "Search English words in Oxford Dictionaries.", [])
 
-    async def execute(self, args, client, channel, guild):
+    async def execute(self, args, meissner_bot, channel, guild):
         try:
             word = args[0]
         except IndexError:
@@ -202,7 +203,7 @@ class PapagoCommand(Command):
     def __init__(self):
         super().__init__('papago', "Translates a text using the NAVER Papago NMT API.", ['pp'])
 
-    async def execute(self, args, client, channel, guild):
+    async def execute(self, args, meissner_bot, channel, guild):
         try:
             source = args[0]
             target = args[1]
@@ -214,17 +215,17 @@ class PapagoCommand(Command):
         translated_text = papago_translate(source, target, text)
 
         if translated_text in papago_error_messages:
-            await error("{0}".format(papago_error_messages[translated_text]), channel)
+            await error("{0} / {1}".format(translated_text, papago_error_messages[translated_text]), channel)
             return
 
-        await result("Papago NMT | {0}-{1}\n```Translation: {2}```".format(source, target, translated_text), channel)
+        await result("| Papago NMT :: {0}->{1} |\n```Translation: {2}```".format(source, target, translated_text), channel)
 
 
 class StatusCommand(Command):
     def __init__(self):
         super().__init__('status', "Changes your status.", ['s'])
 
-    async def execute(self, args, client, channel, guild):
+    async def execute(self, args, meissner_bot, channel, guild):
         status_dict = {
             "online": discord.Status.online,
             "offline": discord.Status.offline,
@@ -239,7 +240,7 @@ class StatusCommand(Command):
             await usage('status <status>', self.description, channel)
             return
 
-        await client.change_presence(status = status)
+        await meissner_bot.change_presence(status = status)
 
         await result("Your status has been changed to '{}'".format(args[0]), channel)
 
@@ -248,15 +249,15 @@ class PrefixCommand(Command):
     def __init__(self):
         super().__init__('prefix', "Shows the current meissner prefix.", [])
 
-    async def execute(self, args, client, channel, guild):
-        await result("Current Prefix: `{}`".format(client.prefix), channel)
+    async def execute(self, args, meissner_bot, channel, guild):
+        await result("Current Prefix: `{}`".format(meissner_bot.prefix), channel)
 
 
 class PruneCommand(Command):
     def __init__(self):
         super().__init__('prune', "Deletes the messages you've sent.", ['p'])
 
-    async def execute(self, args, client, channel, guild):
+    async def execute(self, args, meissner_bot, channel, guild):
         try:
             lim = int(args[0])
         except IndexError:
@@ -270,7 +271,7 @@ class PruneCommand(Command):
         i = 0
 
         async for message in channel.history(limit = lim):
-            if message.author == client.user:
+            if message.author == meissner_bot.user:
                 await message.delete()
                 i += 1
 
@@ -281,24 +282,24 @@ class QuitCommand(Command):
     def __init__(self):
         super().__init__('quit', "Goodbye!", [])
 
-    async def execute(self, args, client, channel, guild):
+    async def execute(self, args, meissner_bot, channel, guild):
         await result("Stopping the self-bot.", channel)
 
-        sys.exit()
+        sys.exit(1)
 
 
 class UserCommand(Command):
     def __init__(self):
         super().__init__('user', "Shows information about a user.", ['u'])
 
-    async def execute(self, args, client, channel, guild):
+    async def execute(self, args, meissner_bot, channel, guild):
         try:
-            target_id = get_id_by_mention(args[0]) # type: int
+            target_id = get_id_by_mention(args[0])
         except IndexError:
             await usage('user <user_mention>', self.description, channel)
             return
 
-        target = guild.get_member(target_id)  # type: discord.Member
+        target = guild.get_member(target_id) # type: discord.Member
 
         if target is None:
             await error("Invalid user mention.", channel)

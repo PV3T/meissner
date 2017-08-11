@@ -52,7 +52,7 @@ class Command(ABC):
     async def execute(
         self,
         args: list,
-        client: discord.Client,
+        meissner_bot,
         channel: discord.abc.Messageable,
         guild: discord.Guild
     ):
