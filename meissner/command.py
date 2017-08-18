@@ -32,8 +32,13 @@
 """
 
 from abc import ABC, abstractmethod
+from meissner import __version_string__
 
 import discord
+import logging
+import meissner.utils
+
+log = logging.getLogger(__name__)
 
 # https://docs.python.org/3/whatsnew/3.4.html#abc
 # New class ABC has ABCMeta as its meta class.
@@ -57,3 +62,21 @@ class Command(ABC):
         guild: discord.Guild
     ):
         raise NotImplementedError
+
+    @staticmethod 
+    async def result(res: str, channel: discord.abc.Messageable, res_color=meissner.utils.get_color("msr_default")):
+        try:
+            emb = discord.Embed(title=__version_string__, description=res, color=res_color)
+            await channel.send(embed=emb)
+        except discord.Forbidden:
+            log.warning("Forbidden: You don't have permissions to send embed messages.")
+            await channel.send("```[{0}]```\n```{1}```".format(__version_string__, res))
+
+    async def error(self, message, channel):
+        await self.result("`ERROR: {}`".format(message), channel, meissner.utils.get_color("red"))
+
+    async def usage(self, message, desc, channel):
+        await self.result(desc + "\n```Usage: {}```".format(message), channel, meissner.utils.get_color("msr_usage"))
+
+    async def warning(self, message, channel):
+        await self.result("`WARNING: {}`".format(message), channel, meissner.utils.get_color("yellow"))

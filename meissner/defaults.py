@@ -31,7 +31,6 @@
     SOFTWARE.
 """
 
-from meissner import __version_string__
 from meissner.command import Command
 from meissner.oxford import get_word_meanings
 from meissner.naver import papago_translate
@@ -55,23 +54,6 @@ papago_error_messages = {
     'N2MT99': 'Internal Server Error.',
 }
 
-async def result(res: str, channel: discord.abc.Messageable, res_color = get_color("msr_default")):
-    try:
-        emb = discord.Embed(title=__version_string__, description=res, color=res_color)
-        await channel.send(embed=emb)
-    except discord.Forbidden:
-        log.warning("Forbidden: You don't have permissions to send embed messages.")
-        await channel.send("```[{0}]```\n```{1}```".format(__version_string__, res))
-
-async def error(message, channel):
-    await result("`ERROR: {}`".format(message), channel, get_color("red"))
-
-async def usage(message, desc, channel):
-    await result(desc + "\n```Usage: {}```".format(message), channel, get_color("msr_usage"))
-
-async def warning(message, channel):
-    await result("`WARNING: {}`".format(message), channel, get_color("yellow"))
-
 class AliasCommand(Command):
     def __init__(self):
         super().__init__('ali', "Manage command aliases.", [])
@@ -81,11 +63,11 @@ class AliasCommand(Command):
             sub = args[0]
             cmd_name = args[1]
         except IndexError:
-            await usage('ali <add / remove / list> <command> {alias}', self.description, channel)
+            await self.usage('ali <add / remove / list> <command> {alias}', self.description, channel)
             return
 
         if sub == "list":
-            await result("{}".format(msrbot.get_command(cmd_name).aliases), channel)
+            await self.result("{}".format(msrbot.get_command(cmd_name).aliases), channel)
             return
 
         command = msrbot.get_command(cmd_name) # type: Command
@@ -94,26 +76,26 @@ class AliasCommand(Command):
             try:
                 ali = args[2]
             except IndexError:
-                await usage('ali add <command> <alias>', self.description, channel)
+                await self.usage('ali add <command> <alias>', self.description, channel)
                 return
 
             msrbot.set_command_aliases([ali], command)
 
-            await result("Added alias '{}' to the command.".format(ali), channel)
+            await self.result("Added alias '{}' to the command.".format(ali), channel)
             return
         elif sub == "remove":
             try:
                 ali = args[2]
             except IndexError:
-                await usage('ali remove <command> <alias>', self.description, channel)
+                await self.usage('ali remove <command> <alias>', self.description, channel)
                 return
 
             msrbot.unset_command_aliases([ali])
 
-            await result("Removed alias '{}' from the command.".format(ali), channel)
+            await self.result("Removed alias '{}' from the command.".format(ali), channel)
             return
         else:
-            await usage('ali <add / remove / list> <command> {alias}', self.description, channel)
+            await self.usage('ali <add / remove / list> <command> {alias}', self.description, channel)
             return
 
 
@@ -127,7 +109,7 @@ class EmbedCommand(Command):
             description = args[1]
             color = get_color(args[2])
         except IndexError:
-            await usage('em <title> <description> <color> [author_mention]', self.description, channel)
+            await self.usage('em <title> <description> <color> [author_mention]', self.description, channel)
             return
 
         emb = discord.Embed(title=title, description=description, color=color)
@@ -157,12 +139,12 @@ class GameCommand(Command):
         try:
             current_game = discord.Game(name = args[0])
         except IndexError:
-            await usage('game <game>', self.description, channel)
+            await self.usage('game <game>', self.description, channel)
             return
 
         await msrbot.change_presence(game = current_game)
 
-        await result("Your custom game has been changed to '{}'" . format(args[0]), channel)
+        await self.result("Your custom game has been changed to '{}'" . format(args[0]), channel)
 
 
 class HelpCommand(Command):
@@ -172,7 +154,7 @@ class HelpCommand(Command):
     async def execute(self, args, msrbot, channel, guild):
         command_list = msrbot.get_commands()
 
-        await result('Commands: ' + ', '.join(command_list), channel)
+        await self.result('Commands: ' + ', '.join(command_list), channel)
 
 
 class OxdictCommand(Command):
@@ -183,13 +165,13 @@ class OxdictCommand(Command):
         try:
             word = args[0]
         except IndexError:
-            await usage('oxdict <word>', self.description, channel)
+            await self.usage('oxdict <word>', self.description, channel)
             return
 
         meanings_list = get_word_meanings(word)
 
         if not meanings_list:
-            await error("No definitions found for the word '{}'".format(word), channel)
+            await self.error("No definitions found for the word '{}'".format(word), channel)
             return
 
         meanings_result = ""
@@ -197,7 +179,7 @@ class OxdictCommand(Command):
         for i in range(0, len(meanings_list)):
             meanings_result += "{0}. {1}\n" . format(i + 1, meanings_list[i])
 
-        await result("Meanings of '{0}' on Oxford Dictionaries:\n```{1}```".format(word, meanings_result), channel)
+        await self.result("Meanings of '{0}' on Oxford Dictionaries:\n```{1}```".format(word, meanings_result), channel)
 
 class PapagoCommand(Command):
     def __init__(self):
@@ -209,16 +191,16 @@ class PapagoCommand(Command):
             target = args[1]
             text = args[2]
         except IndexError:
-            await usage('papago <source> <target> <text>', self.description, channel)
+            await self.usage('papago <source> <target> <text>', self.description, channel)
             return
 
         translated_text = papago_translate(source, target, text)
 
         if translated_text in papago_error_messages:
-            await error("{0} / {1}".format(translated_text, papago_error_messages[translated_text]), channel)
+            await self.error("{0} / {1}".format(translated_text, papago_error_messages[translated_text]), channel)
             return
 
-        await result("| Papago NMT :: {0}->{1} |\n```Translation: {2}```".format(source, target, translated_text), channel)
+        await self.result("| Papago NMT :: {0}->{1} |\n```Translation: {2}```".format(source, target, translated_text), channel)
 
 
 class StatusCommand(Command):
@@ -237,12 +219,12 @@ class StatusCommand(Command):
         try:
             status = status_dict.get(args[0], discord.Status.invisible)
         except IndexError:
-            await usage('status <status>', self.description, channel)
+            await self.usage('status <status>', self.description, channel)
             return
 
         await msrbot.change_presence(status = status)
 
-        await result("Your status has been changed to '{}'".format(args[0]), channel)
+        await self.result("Your status has been changed to '{}'".format(args[0]), channel)
 
 
 class PrefixCommand(Command):
@@ -250,7 +232,7 @@ class PrefixCommand(Command):
         super().__init__('prefix', "Shows the current meissner prefix.", [])
 
     async def execute(self, args, msrbot, channel, guild):
-        await result("Current Prefix: `{}`".format(msrbot.prefix), channel)
+        await self.result("Current Prefix: `{}`".format(msrbot.prefix), channel)
 
 
 class PruneCommand(Command):
@@ -261,11 +243,11 @@ class PruneCommand(Command):
         try:
             lim = int(args[0])
         except IndexError:
-            await usage('prune <limit>', self.description, channel)
+            await self.usage('prune <limit>', self.description, channel)
             return
 
         if lim > 10000 or lim < 0:
-            await result("<limit> should be less than 10000 or greater than 0.", channel)
+            await self.result("<limit> should be less than 10000 or greater than 0.", channel)
             return
 
         i = 0
@@ -275,7 +257,7 @@ class PruneCommand(Command):
                 await message.delete()
                 i += 1
 
-        await result("Deleted {0} messages in #{1} ({2})".format(i, channel.name, guild.name), channel)
+        await self.result("Deleted {0} messages in #{1} ({2})".format(i, channel.name, guild.name), channel)
 
 
 class QuitCommand(Command):
@@ -283,7 +265,7 @@ class QuitCommand(Command):
         super().__init__('quit', "Goodbye!", ['qt'])
 
     async def execute(self, args, msrbot, channel, guild):
-        await result("Stopping the self-bot.", channel)
+        await self.result("Stopping the self-bot.", channel)
 
         raise SystemExit
 
@@ -296,13 +278,13 @@ class UserCommand(Command):
         try:
             target_id = get_id_by_mention(args[0])
         except IndexError:
-            await usage('user <user_mention>', self.description, channel)
+            await self.usage('user <user_mention>', self.description, channel)
             return
 
         target = guild.get_member(target_id) # type: discord.Member
 
         if target is None:
-            await error("Invalid User.", channel)
+            await self.error("Invalid User.", channel)
 
         target_role_list = []
 
@@ -324,4 +306,4 @@ class UserCommand(Command):
             '- top_role: `{5}`\n'
         ).format(target.display_name, target_id, target.joined_at, target.status, target_role_list, target.top_role)
 
-        await result(result_message, channel)
+        await self.result(result_message, channel)

@@ -92,7 +92,6 @@ class MeissnerBot(discord.Client):
 
     async def execute_command(
             self,
-            client: discord.Client,
             channel: discord.TextChannel,
             guild: discord.Guild,
             name: str,
@@ -106,9 +105,9 @@ class MeissnerBot(discord.Client):
 
             command = self.get_command("help")
 
-        await command.execute(args, client, channel, guild)
+        await command.execute(args, self, channel, guild)
 
-    async def execute_from_message(self, client: discord.Client, message: discord.Message):
+    async def execute_from_message(self, message: discord.Message):
         guild = message.guild  # type: discord.Guild
         channel = message.channel  # type: discord.TextChannel
 
@@ -118,7 +117,7 @@ class MeissnerBot(discord.Client):
         command = message_chunks[0].replace(self.prefix, "")
         args = shlex.split(" ".join(message_chunks[1:]))
 
-        await self.execute_command(client, channel, guild, command, args)
+        await self.execute_command(channel, guild, command, args)
 
     def get_command(self, name: str):
         if name not in self.registered_commands:
@@ -158,7 +157,7 @@ class MeissnerBot(discord.Client):
 
         log.info("Processing command: {}" . format(message.content.lower().strip()))
 
-        await self.execute_from_message(self, message)
+        await self.execute_from_message(message)
 
     async def on_ready(self):
         log.info("Connected to the discord gateway. (Logged in as '{}')" . format(self.user.name))
