@@ -7,7 +7,7 @@
     (@@.  /@@,  ,@@/    .&@%,,,,,,     .@@#     ./#%&@@&.    ./(%&@@&.    (@@.  .&@%     &@@/,,,,,.    .@@@
     (@@.  /@@,  ,@@/     #@@#////*     .@@#    ./////&@@.    /////&@@.    (@@.  .&@%     #@@&/////.    .@@@
     (@@.  /@@,  ,@@/      #&@@@@@%     .@@#    ,&@@@@@%.     &@@@@@&.     (@@.  .&@%      *%@@@@@&*    .@@@
-                                                                                                                                
+
     MIT License
 
     Copyright (c) 2017 Epsimatt (https://github.com/Epsimatt/meissner)
@@ -149,7 +149,7 @@ class MeissnerBot(discord.Client):
         log.info(log_msg)
 
     async def on_message(self, message: discord.Message):
-        # self.log_message(message)
+        self.log_message(message)
 
         if not message.author.id == self.user.id or not message.content.startswith(self.prefix):
             return
@@ -198,6 +198,7 @@ try:
 
     if not (token and token.strip()):
         log.critical("Invalid value for token")
+        raise SystemExit
 
     self_bot = MeissnerBot()
     self_bot.run(token, bot = False)

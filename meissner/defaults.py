@@ -39,7 +39,6 @@ from meissner.utils import get_color, get_id_by_mention
 
 import discord
 import logging
-import sys
 
 log = logging.getLogger(__name__)
 
@@ -77,7 +76,7 @@ class AliasCommand(Command):
     def __init__(self):
         super().__init__('ali', "Manage command aliases.", [])
 
-    async def execute(self, args, meissner_bot, channel, guild):
+    async def execute(self, args, msrbot, channel, guild):
         try:
             sub = args[0]
             cmd_name = args[1]
@@ -86,19 +85,19 @@ class AliasCommand(Command):
             return
 
         if sub == "list":
-            await result("{}".format(meissner_bot.get_command(cmd_name).aliases), channel)
+            await result("{}".format(msrbot.get_command(cmd_name).aliases), channel)
             return
 
-        command = meissner_bot.get_command(cmd_name) # type: Command
+        command = msrbot.get_command(cmd_name) # type: Command
 
         if sub == "add":
             try:
                 ali = args[2]
             except IndexError:
-                await usage('ali add <list> <command> <alias>', self.description, channel)
+                await usage('ali add <command> <alias>', self.description, channel)
                 return
 
-            meissner_bot.set_command_aliases([ali], command)
+            msrbot.set_command_aliases([ali], command)
 
             await result("Added alias '{}' to the command.".format(ali), channel)
             return
@@ -106,22 +105,23 @@ class AliasCommand(Command):
             try:
                 ali = args[2]
             except IndexError:
-                await usage('ali remove <list> <command> <alias>', self.description, channel)
+                await usage('ali remove <command> <alias>', self.description, channel)
                 return
 
-            meissner_bot.unset_command_aliases([ali])
+            msrbot.unset_command_aliases([ali])
 
             await result("Removed alias '{}' from the command.".format(ali), channel)
             return
         else:
-            await usage('ali <add / remove> <command> <alias>', self.description, channel)
+            await usage('ali <add / remove / list> <command> {alias}', self.description, channel)
             return
+
 
 class EmbedCommand(Command):
     def __init__(self):
         super().__init__('em', "Sends an embed message with options.", [])
 
-    async def execute(self, args, meissner_bot, channel, guild):
+    async def execute(self, args, msrbot, channel, guild):
         try:
             title = args[0]
             description = args[1]
@@ -140,7 +140,7 @@ class EmbedCommand(Command):
             pass
 
         if target_id != 0:
-            target = meissner_bot.get_user(target_id)  # type: discord.User
+            target = msrbot.get_user(target_id)  # type: discord.User
 
             emb.set_author(name=target.display_name, icon_url=target.avatar_url)
         else:
@@ -153,24 +153,24 @@ class GameCommand(Command):
     def __init__(self):
         super().__init__('game', "Changes the game you're playing now.", [])
 
-    async def execute(self, args, meissner_bot, channel, guild):
+    async def execute(self, args, msrbot, channel, guild):
         try:
             current_game = discord.Game(name = args[0])
         except IndexError:
             await usage('game <game>', self.description, channel)
             return
 
-        await meissner_bot.change_presence(game = current_game)
+        await msrbot.change_presence(game = current_game)
 
         await result("Your custom game has been changed to '{}'" . format(args[0]), channel)
 
 
 class HelpCommand(Command):
     def __init__(self):
-        super().__init__('help', "Shows a list of available commands.", [])
+        super().__init__('help', "Shows a list of available commands.", ['h'])
 
-    async def execute(self, args, meissner_bot, channel, guild):
-        command_list = meissner_bot.get_commands()
+    async def execute(self, args, msrbot, channel, guild):
+        command_list = msrbot.get_commands()
 
         await result('Commands: ' + ', '.join(command_list), channel)
 
@@ -179,7 +179,7 @@ class OxdictCommand(Command):
     def __init__(self):
         super().__init__('oxdict', "Search English words in Oxford Dictionaries.", [])
 
-    async def execute(self, args, meissner_bot, channel, guild):
+    async def execute(self, args, msrbot, channel, guild):
         try:
             word = args[0]
         except IndexError:
@@ -203,7 +203,7 @@ class PapagoCommand(Command):
     def __init__(self):
         super().__init__('papago', "Translates a text using the NAVER Papago NMT API.", ['pp'])
 
-    async def execute(self, args, meissner_bot, channel, guild):
+    async def execute(self, args, msrbot, channel, guild):
         try:
             source = args[0]
             target = args[1]
@@ -225,7 +225,7 @@ class StatusCommand(Command):
     def __init__(self):
         super().__init__('status', "Changes your status.", ['s'])
 
-    async def execute(self, args, meissner_bot, channel, guild):
+    async def execute(self, args, msrbot, channel, guild):
         status_dict = {
             "online": discord.Status.online,
             "offline": discord.Status.offline,
@@ -240,7 +240,7 @@ class StatusCommand(Command):
             await usage('status <status>', self.description, channel)
             return
 
-        await meissner_bot.change_presence(status = status)
+        await msrbot.change_presence(status = status)
 
         await result("Your status has been changed to '{}'".format(args[0]), channel)
 
@@ -249,15 +249,15 @@ class PrefixCommand(Command):
     def __init__(self):
         super().__init__('prefix', "Shows the current meissner prefix.", [])
 
-    async def execute(self, args, meissner_bot, channel, guild):
-        await result("Current Prefix: `{}`".format(meissner_bot.prefix), channel)
+    async def execute(self, args, msrbot, channel, guild):
+        await result("Current Prefix: `{}`".format(msrbot.prefix), channel)
 
 
 class PruneCommand(Command):
     def __init__(self):
         super().__init__('prune', "Deletes the messages you've sent.", ['p'])
 
-    async def execute(self, args, meissner_bot, channel, guild):
+    async def execute(self, args, msrbot, channel, guild):
         try:
             lim = int(args[0])
         except IndexError:
@@ -271,7 +271,7 @@ class PruneCommand(Command):
         i = 0
 
         async for message in channel.history(limit = lim):
-            if message.author == meissner_bot.user:
+            if message.author == msrbot.user:
                 await message.delete()
                 i += 1
 
@@ -280,19 +280,19 @@ class PruneCommand(Command):
 
 class QuitCommand(Command):
     def __init__(self):
-        super().__init__('quit', "Goodbye!", [])
+        super().__init__('quit', "Goodbye!", ['qt'])
 
-    async def execute(self, args, meissner_bot, channel, guild):
+    async def execute(self, args, msrbot, channel, guild):
         await result("Stopping the self-bot.", channel)
 
-        sys.exit(1)
+        raise SystemExit
 
 
 class UserCommand(Command):
     def __init__(self):
         super().__init__('user', "Shows information about a user.", ['u'])
 
-    async def execute(self, args, meissner_bot, channel, guild):
+    async def execute(self, args, msrbot, channel, guild):
         try:
             target_id = get_id_by_mention(args[0])
         except IndexError:
@@ -302,7 +302,7 @@ class UserCommand(Command):
         target = guild.get_member(target_id) # type: discord.Member
 
         if target is None:
-            await error("Invalid user mention.", channel)
+            await error("Invalid User.", channel)
 
         target_role_list = []
 
@@ -310,18 +310,18 @@ class UserCommand(Command):
             role_str = str(target_role)
 
             if role_str[0] == '@':
-                target_role_list.append('discord_' + role_str[1:])
+                target_role_list.append('@\u200b' + role_str[1:])
             else:
                 target_role_list.append(role_str)
 
         # TODO: ...
-        result_message = """
-       **USER: {0}**
-       - id: `{1}`
-       - joined_at: `{2}`
-       - status: `{3}`
-       - roles: `{4}`
-       - top_role: `{5}`
-       """.format(target.display_name, target_id, target.joined_at, target.status, target_role_list, target.top_role)
+        result_message = (
+            '** USER: {0} **\n'
+            '- id: `{1}`\n'
+            '- joined_at: `{2}`\n'
+            '- status: `{3}`\n'
+            '- roles: `{4}`\n'
+            '- top_role: `{5}`\n'
+        ).format(target.display_name, target_id, target.joined_at, target.status, target_role_list, target.top_role)
 
         await result(result_message, channel)

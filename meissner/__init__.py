@@ -34,7 +34,7 @@
 import os.path
 
 __title__ = "meissner"
-__version__ = "v1.1.0_alpha3-indev"
+__version__ = "v1.1.0_alpha4-indev"
 __author__ = "Epsimatt"
 
 __meissner_dir__ = os.path.dirname(os.path.abspath(__file__))
