@@ -31,6 +31,7 @@
     SOFTWARE.
 """
 
+import discord
 import re
 
 # https://material.io/guidelines/style/color.html#color-color-palette
@@ -73,3 +74,11 @@ def get_id_by_mention(mention: str) -> int:
         return 0
 
     return int(result[0])
+
+def split_message(message: discord.Message):
+    content = message.content.lower().strip()
+
+    # re.split() + list(filter(None, ...)) (25.807737269442327) > shlex.split() (197.51727588255525)
+    temp_chunks = re.split('[\'\"]([^\'\"]+)[\'\"]|\s+', content)
+
+    return list(filter(None, temp_chunks))

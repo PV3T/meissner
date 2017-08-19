@@ -54,16 +54,16 @@ class Command(ABC):
         self.aliases = aliases
 
     @abstractmethod
-    async def execute(
-        self,
-        args: list,
-        meissner_bot,
-        channel: discord.abc.Messageable,
-        guild: discord.Guild
-    ):
+    async def execute(self, meissner_client, message: discord.Message):
         raise NotImplementedError
 
-    @staticmethod 
+    @staticmethod
+    def get_args(message: discord.Message):
+        temp_list = meissner.utils.split_message(message)
+
+        return temp_list[1:]
+
+    @staticmethod
     async def result(res: str, channel: discord.abc.Messageable, res_color=meissner.utils.get_color("msr_default")):
         try:
             emb = discord.Embed(title=__version_string__, description=res, color=res_color)

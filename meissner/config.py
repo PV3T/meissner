@@ -50,13 +50,16 @@ class ConfigManager:
             with open(self._config_path, 'w', encoding = 'utf8') as file:
                 json.dump(
                     {
-                        'naver_client_id': '?',
-                        'naver_client_secret': '?',
-                        'oxford_dict_app_id': '?',
-                        'oxford_dict_app_key': '?'
+                        'prefix': '!~',
+                        'discord_token': 'unknown',
+                        'naver_client_id': 'unknown',
+                        'naver_client_secret': 'unknown',
+                        'oxford_app_id': 'unknown',
+                        'oxford_app_key': 'unknown'
                     },
                     file,
-                    ensure_ascii = False
+                    ensure_ascii = False,
+                    indent = 4
                 )
 
                 log.info("Created a new configuration file for meissner.")
