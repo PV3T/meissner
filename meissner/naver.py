@@ -8,6 +8,7 @@
     (@@.  /@@,  ,@@/     #@@#////*     .@@#    ./////&@@.    /////&@@.    (@@.  .&@%     #@@&/////.    .@@@
     (@@.  /@@,  ,@@/      #&@@@@@%     .@@#    ,&@@@@@%.     &@@@@@&.     (@@.  .&@%      *%@@@@@&*    .@@@
 
+
     MIT License
 
     Copyright (c) 2017 Epsimatt (https://github.com/Epsimatt/meissner)
@@ -67,9 +68,6 @@ def papago_translate(source: str, target: str, text: str) -> str:
         }
     )
 
-    if response.status_code != 200:
-        return 'HTTP_' + str(response.status_code)
-
     try:
         raw_dict = response.json()
     except JSONDecodeError:  # Subclass of ValueError
@@ -79,8 +77,8 @@ def papago_translate(source: str, target: str, text: str) -> str:
     if not isinstance(raw_dict, dict) or 'message' not in raw_dict:
         if 'errorCode' in raw_dict:
             return raw_dict['errorCode']
-
-        return ""
+        else:
+            return 'HTTP_' + str(response.status_code)
 
     message = raw_dict['message']
 

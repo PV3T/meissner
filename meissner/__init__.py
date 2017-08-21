@@ -8,6 +8,7 @@
     (@@.  /@@,  ,@@/     #@@#////*     .@@#    ./////&@@.    /////&@@.    (@@.  .&@%     #@@&/////.    .@@@
     (@@.  /@@,  ,@@/      #&@@@@@%     .@@#    ,&@@@@@%.     &@@@@@&.     (@@.  .&@%      *%@@@@@&*    .@@@
 
+
     MIT License
 
     Copyright (c) 2017 Epsimatt (https://github.com/Epsimatt/meissner)
@@ -34,10 +35,12 @@
 import os.path
 
 __title__ = "meissner"
-__version__ = "v1.1.0-beta1"
+__version__ = "v1.1.0_beta3"
 __author__ = "Epsimatt"
+__license__ = 'MIT'
+__github__ = 'https://github.com/Epsimatt/meissner'
+
+__version_string__ = '{}-{} by {}'.format(__title__, __version__, __author__)
 
 __meissner_dir__ = os.path.dirname(os.path.abspath(__file__))
 __root_dir__ = os.path.abspath(os.path.join(__meissner_dir__, os.path.pardir)) + os.path.sep
-
-__version_string__ = '{}-{} by {}'.format(__title__, __version__, __author__)

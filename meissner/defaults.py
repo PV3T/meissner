@@ -8,6 +8,7 @@
     (@@.  /@@,  ,@@/     #@@#////*     .@@#    ./////&@@.    /////&@@.    (@@.  .&@%     #@@&/////.    .@@@
     (@@.  /@@,  ,@@/      #&@@@@@%     .@@#    ,&@@@@@%.     &@@@@@&.     (@@.  .&@%      *%@@@@@&*    .@@@
 
+
     MIT License
 
     Copyright (c) 2017 Epsimatt (https://github.com/Epsimatt/meissner)
@@ -31,6 +32,7 @@
     SOFTWARE.
 """
 
+from meissner import __version_string__, __license__, __github__
 from meissner.command import Command
 from meissner.oxford import get_word_meanings
 from meissner.naver import papago_translate
@@ -160,7 +162,21 @@ class HelpCommand(Command):
     async def execute(self, meissner_client, message: discord.Message):
         command_list = meissner_client.get_commands()
 
-        await self.result('Commands: ' + ', '.join(command_list), message.channel)
+        await self.result('**Commands: `{}`**'.format(', '.join(command_list)), message.channel)
+
+
+class InfoCommand(Command):
+    def __init__(self):
+        super().__init__('info', "Prints the meissner version.", ['if'])
+
+    async def execute(self, meissner_client, message: discord.Message):
+        result_message = (
+            '**{0}**\n\n'
+            'License: {1}\n'
+            'GitHub: {2}\n'
+        ).format(__version_string__, __license__, __github__)
+
+        await self.result(result_message, message.channel)
 
 
 class OxdictCommand(Command):
@@ -211,13 +227,18 @@ class PapagoCommand(Command):
 
         if translated_text in papago_error_messages:
             await self.error(
-                "{0} / {1}".format(translated_text, papago_error_messages[translated_text]),
+                translated_text + ' / ' + papago_error_messages[translated_text],
                 message.channel
             )
             return
 
         await self.result(
-            "| Papago NMT :: {0}->{1} |\n```Translation: {2}```".format(source, target, translated_text),
+            '**Papago NMT :: {0} -> {1}**\n\nSource: "{2}"\nTarget: "{3}"'.format(
+                source,
+                target,
+                text,
+                translated_text
+            ),
             message.channel
         )
 
@@ -309,29 +330,37 @@ class UserCommand(Command):
             await self.usage('user <user_mention>', self.description, message.channel)
             return
 
-        target = message.guild.get_member(target_id) # type: discord.Member
+        target_m = message.guild.get_member(target_id) # type: discord.Member
+        target_u = meissner_client.get_user(target_id) # type: discord.User
 
-        if target is None:
-            await self.error("Invalid User.", message.channel)
+        if target_m is None:
+            await self.error("Invalid Member.", message.channel)
 
         target_role_list = []
 
-        for target_role in target.roles:
+        for target_role in target_m.roles:
             role_str = str(target_role)
 
-            if role_str[0] == '@':
-                target_role_list.append('@\u200b' + role_str[1:])
-            else:
-                target_role_list.append(role_str)
+            target_role_list.append(role_str)
 
-        # TODO: ...
         result_message = (
-            '** USER: {0} **\n'
-            '- id: `{1}`\n'
-            '- joined_at: `{2}`\n'
-            '- status: `{3}`\n'
-            '- roles: `{4}`\n'
-            '- top_role: `{5}`\n'
-        ).format(target.display_name, target_id, target.joined_at, target.status, target_role_list, target.top_role)
+            '**USER: {0} (@{1}#{2})**\n\n'
+            '- id: `{3}`\n'
+            '- joined_at: `{4}`\n'
+            '- status: `{5}`\n'
+            '- roles: `{6}`\n'
+            '- top_role: `{7}`\n'
+            '- avatar_url: {8}'
+        ).format(
+            target_m.display_name,
+            target_u.name,
+            target_u.discriminator,
+            target_id,
+            target_m.joined_at,
+            target_m.status,
+            ", ".join(target_role_list),
+            target_m.top_role,
+            target_u.avatar_url
+        )
 
         await self.result(result_message, message.channel)

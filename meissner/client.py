@@ -8,6 +8,7 @@
     (@@.  /@@,  ,@@/     #@@#////*     .@@#    ./////&@@.    /////&@@.    (@@.  .&@%     #@@&/////.    .@@@
     (@@.  /@@,  ,@@/      #&@@@@@%     .@@#    ,&@@@@@%.     &@@@@@&.     (@@.  .&@%      *%@@@@@&*    .@@@
 
+
     MIT License
 
     Copyright (c) 2017 Epsimatt (https://github.com/Epsimatt/meissner)
@@ -54,6 +55,7 @@ class MeissnerClient(discord.Client):
         self.register_command(meissner.defaults.EmbedCommand())
         self.register_command(meissner.defaults.GameCommand())
         self.register_command(meissner.defaults.HelpCommand())
+        self.register_command(meissner.defaults.InfoCommand())
         self.register_command(meissner.defaults.OxdictCommand())
         self.register_command(meissner.defaults.PapagoCommand())
         self.register_command(meissner.defaults.PrefixCommand())

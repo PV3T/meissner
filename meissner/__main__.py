@@ -8,6 +8,7 @@
     (@@.  /@@,  ,@@/     #@@#////*     .@@#    ./////&@@.    /////&@@.    (@@.  .&@%     #@@&/////.    .@@@
     (@@.  /@@,  ,@@/      #&@@@@@%     .@@#    ,&@@@@@%.     &@@@@@&.     (@@.  .&@%      *%@@@@@&*    .@@@
 
+
     MIT License
 
     Copyright (c) 2017 Epsimatt (https://github.com/Epsimatt/meissner)
@@ -68,7 +69,7 @@ log.addHandler(log_handler)
 
 config_manager = meissner.config.ConfigManager()
 
-token = config_manager.get('discord_token')
+token = config_manager.get('token')
 prefix = config_manager.get('prefix')
 
 if not (token and token.strip()):
