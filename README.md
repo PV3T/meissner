@@ -24,7 +24,7 @@
 
 3. Install the 'Requirements' below
 
-4. Run loader.py
+4. `py -m meissner`
 
 ## Requirements
 ```
