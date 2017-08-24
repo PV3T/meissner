@@ -11,7 +11,7 @@
 
     MIT License
 
-    Copyright (c) 2017 Epsimatt (https://github.com/Epsimatt/meissner)
+    Copyright (c) 2017 epsimatt (https://github.com/epsimatt/meissner)
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -71,7 +71,7 @@ class AliasCommand(Command):
             return
 
         if sub == "list":
-            await self.result("{}".format(meissner_client.get_command(cmd_name).aliases), message.channel)
+            await self.result("`{}`".format(meissner_client.get_command(cmd_name).aliases), message.channel)
             return
 
         command = meissner_client.get_command(cmd_name) # type: Command

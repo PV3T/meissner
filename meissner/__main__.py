@@ -11,7 +11,7 @@
 
     MIT License
 
-    Copyright (c) 2017 Epsimatt (https://github.com/Epsimatt/meissner)
+    Copyright (c) 2017 epsimatt (https://github.com/epsimatt/meissner)
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -52,7 +52,6 @@ class MeissnerFormatter(logging.Formatter):
 
 
 log = logging.getLogger()
-
 log.setLevel(logging.INFO)
 
 log_handler = logging.StreamHandler()

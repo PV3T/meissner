@@ -11,7 +11,7 @@
 
     MIT License
 
-    Copyright (c) 2017 Epsimatt (https://github.com/Epsimatt/meissner)
+    Copyright (c) 2017 epsimatt (https://github.com/epsimatt/meissner)
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -41,8 +41,8 @@ log = logging.getLogger(__name__)
 
 config_mgr = meissner.config.ConfigManager()
 
-app_id = config_mgr.get('oxford_dict_app_id')
-app_key = config_mgr.get('oxford_dict_app_key')
+app_id = config_mgr.get('oxford_app_id')
+app_key = config_mgr.get('oxford_app_key')
 
 api_url = "https://od-api.oxforddictionaries.com/api/v1/entries/en/"
 

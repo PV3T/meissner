@@ -11,7 +11,7 @@
 
     MIT License
 
-    Copyright (c) 2017 Epsimatt (https://github.com/Epsimatt/meissner)
+    Copyright (c) 2017 epsimatt (https://github.com/epsimatt/meissner)
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -41,9 +41,9 @@ import os.path
 log = logging.getLogger(__name__)
 
 class ConfigManager:
-    _config = {}
-
     _config_path = __root_dir__ + 'config.json'
+
+    _config = {}
 
     def __init__(self):
         # Generate a new config.json file if it does not exist
@@ -63,8 +63,10 @@ class ConfigManager:
                     indent = 4
                 )
 
-                log.info("Created a new configuration file for meissner.")
-                log.info("Please set up the config.json file.")
+            log.info("Created a new configuration file for meissner.")
+            log.info("Please set up the config.json file.")
+
+            raise SystemExit
 
         with open(self._config_path) as file:
             self._config = json.load(file)

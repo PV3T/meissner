@@ -11,7 +11,7 @@
 
     MIT License
 
-    Copyright (c) 2017 Epsimatt (https://github.com/Epsimatt/meissner)
+    Copyright (c) 2017 epsimatt (https://github.com/epsimatt/meissner)
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,7 @@
 import os.path
 
 __title__ = "meissner"
-__version__ = "v1.1.0_beta3"
+__version__ = "v1.1.0_beta4"
 __author__ = "Epsimatt"
 __license__ = 'MIT'
 __github__ = 'https://github.com/Epsimatt/meissner'

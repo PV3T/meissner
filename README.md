@@ -3,10 +3,11 @@
 </div>
 
 ## Commands
-- `ali <add / remove> <command> <alias>`: Manage command aliases.
+- `ali <add / remove / list> <command> {alias}`: Manage command aliases.
 - `em <title> <description> <color> [author_mention]`: Sends an embed message with options.
 - `game <game>`: Changes the game you're playing now.
 - `help`: Shows a list of available commands.
+- `info`: Prints the meissner version.
 - `oxdict <word>`: Search English words in Oxford Dictionaries.
 - `papago <source> <target> <text>`: Translates a text using the NAVER Papago NMT API.
 - `status <status>`: Changes your status.
